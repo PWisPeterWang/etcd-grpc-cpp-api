@@ -17,3 +17,19 @@ ninja -C build
 ```
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+According to the TERMS of Apache 2.0 license, here are the changes to the proto files obtained from:
+
+## googleapis
+
+1. googleapis/google/api/annotations.proto
+   replaced the proto file's `import "google/api/http.proto";` to `import "google/api/http.proto";`
+
+## etcd
+
+1. etcd/api/authpb/auth.proto
+2. etcd/api/etcdserverpb/etcdserver.proto
+3. etcd/api/etcdserverpb/rpc.proto
+4. etcd/api/mvccpb/kv.proto
+
+replaced the import path to make it easier for protobuf compiler. see `gen_proto.sh` for detail.
