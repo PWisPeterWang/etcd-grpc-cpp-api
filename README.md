@@ -31,5 +31,4 @@ According to the TERMS of Apache 2.0 license, here are the changes to the proto 
 2. etcd/api/etcdserverpb/etcdserver.proto
 3. etcd/api/etcdserverpb/rpc.proto
 4. etcd/api/mvccpb/kv.proto
-
-replaced the import path to make it easier for protobuf compiler. see `gen_proto.sh` for detail.
+   replace the import path

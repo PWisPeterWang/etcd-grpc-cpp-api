@@ -1,54 +1,55 @@
 cmake_minimum_required(VERSION 3.21)
 
-set(ETCD-V3-API-CPP_VERSION_MAJOR 3)
-set(ETCD-V3-API-CPP_VERSION_MINOR 5)
-set(ETCD-V3-API-CPP_VERSION_PATCH 10)
-project(etcd-v3-grpc-cpp 
+set(ETCDV3_CPP_API_VERSION_MAJOR 3)
+set(ETCDV3_CPP_API_VERSION_MINOR 5)
+set(ETCDV3_CPP_API_VERSION_PATCH 10)
+project(etcdv3-api-cpp 
     LANGUAGES CXX C 
-    VERSION ${ETCD-V3-API-CPP_VERSION_MAJOR}.${ETCD-V3-API-CPP_VERSION_MINOR}.${ETCD-V3-API-CPP_VERSION_PATCH})
+    VERSION ${ETCDV3_CPP_API_VERSION_MAJOR}.${ETCDV3_CPP_API_VERSION_MINOR}.${ETCDV3_CPP_API_VERSION_PATCH})
 
-# edit the following settings as you desire
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_EXTENSION OFF)
-add_compile_options(-Wfatal-errors)
 
-# edit the following line to add your cmake modules
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
-# edit the following line to add your dependencies
-find_package(gRPC REQUIRED)
+# here we use the CONFIG mode for finding gRPC and protobuf
+# if you don't have gRPC and protobuf installed in common well known path
+# you need to set the -DCMAKE_PREFIX_PATH=/path/to/your/install/prefix
+# then cmake shall find the config file generated when you build grpc from source
+find_package(protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC version ${gRPC_VERSION}")
-find_package(Protobuf REQUIRED)
-message(STATUS "Using protobuf version ${Protobuf_VERSION}")
-find_package(Threads REQUIRED)
 
-message(STATUS "Updating and init submodules")
-execute_process(
-    COMMAND git submodule update --init)
-message(STATUS "Submodules done")
+file(GLOB_RECURSE
+    ETCD_PROTO "etcd/*.proto" "google/*.proto")
+add_library(${PROJECT_NAME}
+    STATIC
+        ${ETCD_PROTO})
+protobuf_generate(
+    TARGET ${PROJECT_NAME}
+    IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
-message(STATUS "Generating protobuf sources")
-execute_process(
-    COMMAND bash ${CMAKE_SOURCE_DIR}/gen_proto.sh)
-message(STATUS "Protobuf sources done")
-
-file(GLOB_RECURSE API_SRCS "etcd-v3-grpc-cpp/*.cc")
-add_library(${PROJECT_NAME} STATIC ${API_SRCS})
+protobuf_generate(
+    TARGET ${PROJECT_NAME}
+    IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+    LANGUAGE grpc
+    GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
+    PLUGIN "protoc-gen-grpc=\$<TARGET_FILE:gRPC::grpc_cpp_plugin>")
 
 # you may add more dependencies' header dir here
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/etcd-v3-grpc-cpp>
-        $<INSTALL_INTERFACE:etcd-v3-grpc-cpp>
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/src)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<INSTALL_INTERFACE:etcdv3-api-cpp>)
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         protobuf::libprotobuf
-        gRPC::grpc
         gRPC::grpc++)
-
+target_compile_options(${PROJECT_NAME}
+    PUBLIC
+        "-Wfatal-errors")
+# this cxx_std_14 can be replace with cxx_std_11 ONLY if your gRPC version supports cxx11
+target_compile_features(${PROJECT_NAME}
+    PUBLIC
+        cxx_std_14)
 
 # install settings
 include(GNUInstallDirs)
@@ -58,18 +59,22 @@ install(TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 # install public headers
-set(PUBLIC_HEADER_DIR ${PROJECT_SOURCE_DIR}/etcd-v3-grpc-cpp)
-install(DIRECTORY ${PUBLIC_HEADER_DIR}
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/etcd
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/etcdv3-api-cpp
     FILES_MATCHING
         PATTERN "*.h"
-        PATTERN "*.hpp"
 )
+
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/google
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/etcdv3-api-cpp
+    FILES_MATCHING
+        PATTERN "*.h")
+
 # auto versioning reads from header.h to get versionstring
-message(STATUS "current etcd-v3-api-cpp version: ${ETCD-V3-API-CPP_VERSION_MAJOR}.${ETCD-V3-API-CPP_VERSION_MINOR}.${ETCD-V3-API-CPP_VERSION_PATCH}")
-set(CPACK_PACKAGE_VERSION_MAJOR ${ETCD-V3-API-CPP_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${ETCD-V3-API-CPP_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${ETCD-V3-API-CPP_VERSION_PATCH})
+message(STATUS "current etcd-v3-api-cpp version: ${ETCDV3_CPP_API_VERSION_MAJOR}.${ETCDV3_CPP_API_VERSION_MINOR}.${ETCDV3_CPP_API_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION_MAJOR ${ETCDV3_CPP_API_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${ETCDV3_CPP_API_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${ETCDV3_CPP_API_VERSION_PATCH})
 # cpack settings, edit the following to pack up as you desire
 if(UNIX)
     set(CPACK_GENERATOR "TGZ")
