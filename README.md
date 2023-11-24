@@ -1,12 +1,11 @@
 # etcd-v3-api-cpp
-A project for generating etcd v3 api for C++ based on gRPC.
+A easy protobuf-cmake-cpp project for generating etcd v3 api for C++ based on gRPC.
 Normally it requires a C++ compiler which supports C++14 (due to gRPC dependencies).
 It might work with lower version of C++ compiler (e.g. gcc 4.8.5) with older gRPC version.
 Currently it's designed to work on Linux platform.
 
-Basically, the project takes the proto files dependencies from [etcd](https://github.com/etcd-io/etcd.git) and [googleapis](https://github.com/googleapis/googleapis.git). With the help of `protobuf_generate` from CMake, we can easily build a static library containing the necessary grpc interface to access etcd v3 server using C++.
+The project takes the proto files dependencies from [etcd](https://github.com/etcd-io/etcd.git) (version 3.5.10) and [googleapis](https://github.com/googleapis/googleapis.git). With the help of `protobuf_generate` from CMake, we can easily build a static library containing the necessary grpc interface to access etcd v3 server using C++.
 
-Currently it's bulding with etcd version 3.5.10. You can switch to other version of etcd in the submodule repo. 
 
 ## Build
 ```bash
