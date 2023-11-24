@@ -23,6 +23,7 @@ According to the TERMS of Apache 2.0 license, here are the changes to the proto 
 ## googleapis
 
 1. googleapis/google/api/annotations.proto
+
    files taken to `google/api`.
 
 ## etcd
@@ -31,4 +32,5 @@ According to the TERMS of Apache 2.0 license, here are the changes to the proto 
 2. etcd/api/etcdserverpb/etcdserver.proto
 3. etcd/api/etcdserverpb/rpc.proto
 4. etcd/api/mvccpb/kv.proto
+
    files taken to `etcd/api`, the import paths are replaced accordingly, gogoproto dependencies removed.
