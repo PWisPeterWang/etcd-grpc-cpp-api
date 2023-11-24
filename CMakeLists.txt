@@ -63,7 +63,7 @@ install(TARGETS ${PROJECT_NAME}
 install(EXPORT ETCDV3_CPP_API_EXPORT
     FILE etcdv3-api-cpp-config.cmake
     NAMESPACE etcdv3-api-cpp::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/etcdv3-api-cpp)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
@@ -71,7 +71,7 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion)
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/etcdv3-api-cpp-config-version.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/etcdv3-api-cpp)
 
 # install public headers
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/etcd
