@@ -54,10 +54,25 @@ target_compile_features(${PROJECT_NAME}
 # install settings
 include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME}
+    EXPORT ETCDV3_CPP_API_EXPORT
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+install(EXPORT ETCDV3_CPP_API_EXPORT
+    FILE etcdv3-api-cpp-config.cmake
+    NAMESPACE etcdv3-api-cpp::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "etcdv3-api-cpp-config-version.cmake"
+    COMPATIBILITY SameMajorVersion)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/etcdv3-api-cpp-config-version.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+
 # install public headers
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/etcd
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/etcdv3-api-cpp
@@ -71,7 +86,7 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/google
         PATTERN "*.h")
 
 # auto versioning reads from header.h to get versionstring
-message(STATUS "current etcd-v3-api-cpp version: ${ETCDV3_CPP_API_VERSION_MAJOR}.${ETCDV3_CPP_API_VERSION_MINOR}.${ETCDV3_CPP_API_VERSION_PATCH}")
+message(STATUS "current etcdv3-api-cpp version: ${ETCDV3_CPP_API_VERSION_MAJOR}.${ETCDV3_CPP_API_VERSION_MINOR}.${ETCDV3_CPP_API_VERSION_PATCH}")
 set(CPACK_PACKAGE_VERSION_MAJOR ${ETCDV3_CPP_API_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${ETCDV3_CPP_API_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${ETCDV3_CPP_API_VERSION_PATCH})
